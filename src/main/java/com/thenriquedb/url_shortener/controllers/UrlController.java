@@ -1,7 +1,7 @@
 package com.thenriquedb.url_shortener.controllers;
 
 import com.thenriquedb.url_shortener.dtos.UrlRecordDto;
-import com.thenriquedb.url_shortener.dtos.UrlResponse;
+import com.thenriquedb.url_shortener.dtos.UrlResponseRecordDto;
 import com.thenriquedb.url_shortener.schemas.UrlSchema;
 import com.thenriquedb.url_shortener.services.UrlService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,9 +18,9 @@ public class UrlController {
     UrlService urlService;
 
     @PostMapping("/shorten")
-    public ResponseEntity<UrlResponse> shortenUrl(@RequestBody UrlRecordDto urlRecord, HttpServletRequest request) {
+    public ResponseEntity<UrlResponseRecordDto> shortenUrl(@RequestBody UrlRecordDto urlRecord, HttpServletRequest request) {
         String shortUrl = urlService.generateShortUrl(urlRecord.url(), request.getRequestURL().toString());
-        return ResponseEntity.ok().body(new UrlResponse(shortUrl));
+        return ResponseEntity.ok().body(new UrlResponseRecordDto(shortUrl));
     }
 
     @GetMapping("/{id}")
