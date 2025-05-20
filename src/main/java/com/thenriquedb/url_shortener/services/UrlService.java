@@ -4,6 +4,8 @@ import com.thenriquedb.url_shortener.repositories.UrlRepository;
 import com.thenriquedb.url_shortener.schemas.UrlSchema;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -15,27 +17,28 @@ public class UrlService {
         return urlRepository.findById(id).orElse(null);
     }
 
-    public String generateShortUrl(String originalUrl, String requestUrl) {
+    public String generateShortUrl(String originalUrl, LocalDateTime expireAt, String requestUrl) {
         UrlSchema exitedUrl = urlRepository.findByOriginalUrl(originalUrl);
 
         if(exitedUrl != null) {
-           return requestUrl.replace("shorten", exitedUrl.getId());
+           return requestUrl + "/" + exitedUrl.getId();
         }
 
-        String urlId;
+        String urlHash;
         do {
-            urlId = UUID.randomUUID()
+            urlHash = UUID.randomUUID()
                     .toString()
                     .replace("-","")
                     .substring(0, 10);
-        } while (urlRepository.existsById(urlId));
+        } while (urlRepository.existsById(urlHash));
 
         UrlSchema urlSchema = new UrlSchema();
-        urlSchema.setId(urlId);
+        urlSchema.setId(urlHash);
+        urlSchema.setExpiresAt(expireAt);
         urlSchema.setOriginalUrl(originalUrl);
 
         urlRepository.save(urlSchema);
 
-        return requestUrl.replace("shorten", urlId);
+        return requestUrl + "/" + urlHash;
     }
 }

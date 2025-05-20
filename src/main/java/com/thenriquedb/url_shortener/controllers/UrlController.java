@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpHeaders;
 
+import java.time.LocalDateTime;
+
 @RestController
 @RequestMapping("/")
 public class UrlController {
@@ -19,8 +21,16 @@ public class UrlController {
 
     @PostMapping("/shorten")
     public ResponseEntity<UrlResponseRecordDto> shortenUrl(@RequestBody UrlRecordDto urlRecord, HttpServletRequest request) {
-        String shortUrl = urlService.generateShortUrl(urlRecord.url(), request.getRequestURL().toString());
-        return ResponseEntity.ok().body(new UrlResponseRecordDto(shortUrl));
+        LocalDateTime expiresAt = null;
+
+        if (urlRecord.expiresAt() != null) {
+            expiresAt = LocalDateTime.parse(urlRecord.expiresAt());
+        }
+
+        String requestUrl = request.getRequestURL().toString().replace(request.getRequestURI(), "");
+        String shortUrl = urlService.generateShortUrl(urlRecord.url(), expiresAt, requestUrl);
+
+        return ResponseEntity.ok().body(new UrlResponseRecordDto(shortUrl, expiresAt));
     }
 
     @GetMapping("/{id}")
