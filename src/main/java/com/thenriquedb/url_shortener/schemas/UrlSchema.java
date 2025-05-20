@@ -4,8 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
+
+import java.time.LocalDateTime;
 
 @Document(collection = "url")
 @Getter
@@ -17,7 +20,6 @@ public class UrlSchema {
     String id;
     String originalUrl;
 
-    public UrlSchema(String originalUrl) {
-        this.originalUrl = originalUrl;
-    }
+    @Indexed(name = "ttl", expireAfter = "0")
+    LocalDateTime expiresAt;
 }
