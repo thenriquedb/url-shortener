@@ -2,8 +2,8 @@ package com.thenriquedb.url_shortener.services;
 
 import com.thenriquedb.url_shortener.repositories.redis.UrlCacheRepository;
 import com.thenriquedb.url_shortener.repositories.mongo.UrlRepository;
-import com.thenriquedb.url_shortener.schemas.UrlCacheSchema;
-import com.thenriquedb.url_shortener.schemas.UrlSchema;
+import com.thenriquedb.url_shortener.shared.schemas.UrlCacheSchema;
+import com.thenriquedb.url_shortener.shared.schemas.UrlSchema;
 import com.thenriquedb.url_shortener.shared.exceptions.InvalidExpireDateException;
 import com.thenriquedb.url_shortener.shared.util.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;

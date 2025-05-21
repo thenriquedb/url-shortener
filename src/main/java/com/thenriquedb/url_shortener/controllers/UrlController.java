@@ -2,7 +2,7 @@ package com.thenriquedb.url_shortener.controllers;
 
 import com.thenriquedb.url_shortener.dtos.UrlRecordDto;
 import com.thenriquedb.url_shortener.dtos.UrlResponseRecordDto;
-import com.thenriquedb.url_shortener.schemas.UrlSchema;
+import com.thenriquedb.url_shortener.shared.schemas.UrlSchema;
 import com.thenriquedb.url_shortener.services.UrlService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
