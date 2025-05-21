@@ -2,11 +2,12 @@ package com.thenriquedb.url_shortener.services;
 
 import com.thenriquedb.url_shortener.repositories.redis.UrlCacheRepository;
 import com.thenriquedb.url_shortener.repositories.mongo.UrlRepository;
+import com.thenriquedb.url_shortener.schemas.UrlCacheSchema;
 import com.thenriquedb.url_shortener.schemas.UrlSchema;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -19,16 +20,31 @@ public class UrlService {
     UrlCacheRepository urlCacheRepository;
 
     public UrlSchema getUrlById(String urlHash) {
-        Optional<UrlSchema> urlFromCache = urlCacheRepository.findById(urlHash);
+        Optional<UrlCacheSchema> urlFromCache = urlCacheRepository.findById(urlHash);
 
         if (urlFromCache.isPresent()) {
-            return urlFromCache.get();
+            UrlCacheSchema urlCacheSchema = urlFromCache.get();
+
+            UrlSchema urlSchema = new UrlSchema();
+            urlSchema.setId(urlCacheSchema.getId());
+            urlSchema.setOriginalUrl(urlCacheSchema.getOriginalUrl());
+            urlSchema.setExpiresAt(LocalDateTime.now().plusSeconds(urlCacheSchema.getExpirationInSeconds()));
+
+            return urlSchema;
         }
 
-        UrlSchema foundedUrl= urlRepository.findById(urlHash).orElse(null);
+        UrlSchema foundedUrl = urlRepository.findById(urlHash).orElse(null);
 
         if (foundedUrl != null) {
-            urlCacheRepository.save(foundedUrl);
+            UrlCacheSchema urlCacheSchema = new UrlCacheSchema();
+            urlCacheSchema.setId(foundedUrl.getId());
+            urlCacheSchema.setOriginalUrl(foundedUrl.getOriginalUrl());
+            Long expireInSeconds = ChronoUnit.SECONDS.between(
+                    LocalDateTime.now(),
+                    foundedUrl.getExpiresAt() != null ? foundedUrl.getExpiresAt() : LocalDateTime.now().plusDays(1)
+            );
+
+            urlCacheRepository.save(urlCacheSchema);
         }
 
         return foundedUrl;
@@ -56,7 +72,18 @@ public class UrlService {
 
         urlRepository.save(urlSchema);
 
-        urlCacheRepository.save(urlSchema);
+        UrlCacheSchema urlCacheSchema = new UrlCacheSchema();
+        urlCacheSchema.setId(urlHash);
+        urlCacheSchema.setOriginalUrl(originalUrl);
+
+        Long expireInSeconds = ChronoUnit.SECONDS.between(
+                LocalDateTime.now(),
+                expireAt != null ? expireAt : LocalDateTime.now().plusDays(1)
+        );
+
+        urlCacheSchema.setExpirationInSeconds(expireInSeconds);
+        urlCacheRepository.save(urlCacheSchema);
+
         return requestUrl + "/" + urlHash;
     }
 }
