@@ -4,10 +4,10 @@ import com.thenriquedb.url_shortener.repositories.redis.UrlCacheRepository;
 import com.thenriquedb.url_shortener.repositories.mongo.UrlRepository;
 import com.thenriquedb.url_shortener.schemas.UrlCacheSchema;
 import com.thenriquedb.url_shortener.schemas.UrlSchema;
+import com.thenriquedb.url_shortener.util.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,9 +26,7 @@ public class UrlService {
             UrlCacheSchema urlCacheSchema = urlFromCache.get();
 
             UrlSchema urlSchema = new UrlSchema();
-            urlSchema.setId(urlCacheSchema.getId());
-            urlSchema.setOriginalUrl(urlCacheSchema.getOriginalUrl());
-            urlSchema.setExpiresAt(LocalDateTime.now().plusSeconds(urlCacheSchema.getExpirationInSeconds()));
+            urlSchema.fromUrlCacheSchema(urlCacheSchema);
 
             return urlSchema;
         }
@@ -37,12 +35,7 @@ public class UrlService {
 
         if (foundedUrl != null) {
             UrlCacheSchema urlCacheSchema = new UrlCacheSchema();
-            urlCacheSchema.setId(foundedUrl.getId());
-            urlCacheSchema.setOriginalUrl(foundedUrl.getOriginalUrl());
-            Long expireInSeconds = ChronoUnit.SECONDS.between(
-                    LocalDateTime.now(),
-                    foundedUrl.getExpiresAt() != null ? foundedUrl.getExpiresAt() : LocalDateTime.now().plusDays(1)
-            );
+            urlCacheSchema.fromUrlSchema(foundedUrl);
 
             urlCacheRepository.save(urlCacheSchema);
         }
@@ -75,13 +68,8 @@ public class UrlService {
         UrlCacheSchema urlCacheSchema = new UrlCacheSchema();
         urlCacheSchema.setId(urlHash);
         urlCacheSchema.setOriginalUrl(originalUrl);
+        urlCacheSchema.setExpirationInSeconds(DateUtils.calculateDifferenceInSeconds(expireAt));
 
-        Long expireInSeconds = ChronoUnit.SECONDS.between(
-                LocalDateTime.now(),
-                expireAt != null ? expireAt : LocalDateTime.now().plusDays(1)
-        );
-
-        urlCacheSchema.setExpirationInSeconds(expireInSeconds);
         urlCacheRepository.save(urlCacheSchema);
 
         return requestUrl + "/" + urlHash;
