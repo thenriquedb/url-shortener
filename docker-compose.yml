@@ -10,13 +10,8 @@ services:
     ports:
       - 27017:27017
 
-  mongo-express:
-    image: mongo-express
+  cache:
+    image: redis:latest
     restart: always
     ports:
-      - 8081:8081
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: example
-      ME_CONFIG_MONGODB_URL: mongodb://root:password@mongo:27017/
-      ME_CONFIG_BASICAUTH: false
+      - 6379:6379
