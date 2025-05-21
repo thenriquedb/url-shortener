@@ -29,4 +29,10 @@ public class UrlSchema implements Serializable {
 
     @Indexed(name = "ttl", expireAfter = "0")
     LocalDateTime expiresAt;
+
+    public void fromUrlCacheSchema(UrlCacheSchema urlCacheSchema) {
+        this.id = urlCacheSchema.getId();
+        this.originalUrl = urlCacheSchema.getOriginalUrl();
+        this.expiresAt = LocalDateTime.now().plusSeconds(urlCacheSchema.getExpirationInSeconds());
+    }
 }
