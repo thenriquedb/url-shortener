@@ -1,5 +1,6 @@
 package com.thenriquedb.url_shortener.schemas;
 
+import com.thenriquedb.url_shortener.util.DateUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,4 +28,9 @@ public class UrlCacheSchema  {
     @TimeToLive
     private Long expirationInSeconds;
 
+    public void fromUrlSchema(UrlSchema urlSchema) {
+        this.id = urlSchema.getId();
+        this.originalUrl = urlSchema.getOriginalUrl();
+        this.expirationInSeconds = DateUtils.calculateDifferenceInSeconds(urlSchema.getExpiresAt());
+    }
 }
