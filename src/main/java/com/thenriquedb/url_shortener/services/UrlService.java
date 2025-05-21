@@ -44,10 +44,10 @@ public class UrlService {
     }
 
     public String generateShortUrl(String originalUrl, LocalDateTime expireAt, String requestUrl) {
-        UrlSchema exitedUrl = urlRepository.findByOriginalUrl(originalUrl);
+        UrlSchema existedUrl = urlRepository.findByOriginalUrl(originalUrl);
 
-        if(exitedUrl != null) {
-           return requestUrl + "/" + exitedUrl.getId();
+        if(existedUrl != null) {
+           return requestUrl + "/" + existedUrl.getId();
         }
 
         String urlHash;
