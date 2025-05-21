@@ -4,7 +4,8 @@ import com.thenriquedb.url_shortener.repositories.redis.UrlCacheRepository;
 import com.thenriquedb.url_shortener.repositories.mongo.UrlRepository;
 import com.thenriquedb.url_shortener.schemas.UrlCacheSchema;
 import com.thenriquedb.url_shortener.schemas.UrlSchema;
-import com.thenriquedb.url_shortener.util.DateUtils;
+import com.thenriquedb.url_shortener.shared.exceptions.InvalidExpireDateException;
+import com.thenriquedb.url_shortener.shared.util.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -48,6 +49,12 @@ public class UrlService {
 
         if(existedUrl != null) {
            return requestUrl + "/" + existedUrl.getId();
+        }
+
+        boolean expireDateIsInvalid = expireAt.isBefore(LocalDateTime.now());
+
+        if (expireDateIsInvalid) {
+            throw new InvalidExpireDateException("Expiration date must be in the future");
         }
 
         String urlHash;
