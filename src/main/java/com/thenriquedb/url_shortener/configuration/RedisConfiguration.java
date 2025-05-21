@@ -1,5 +1,6 @@
 package com.thenriquedb.url_shortener.configuration;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
@@ -14,6 +15,12 @@ import org.springframework.data.redis.repository.configuration.EnableRedisReposi
 @EnableMongoRepositories(basePackages = "com.thenriquedb.url_shortener.repositories.mongo")
 @EnableRedisRepositories(basePackages = "com.thenriquedb.url_shortener.repositories.redis")
 class RedisConfiguration {
+    @Value("${spring.redis.host}")
+    private String host;
+
+    @Value("${spring.redis.port}")
+    private Integer port;
+
     @Bean
     public RedisCacheManager redisCacheManager(RedisConnectionFactory connectionFactory) {
         return RedisCacheManager.create(connectionFactory);
@@ -21,6 +28,6 @@ class RedisConfiguration {
 
     @Bean
     public RedisConnectionFactory connectionFactory() {
-        return new LettuceConnectionFactory(new RedisStandaloneConfiguration("localhost", 6379));
+        return new LettuceConnectionFactory(new RedisStandaloneConfiguration(host, port));
     }
 }
