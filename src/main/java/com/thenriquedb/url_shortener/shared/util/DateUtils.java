@@ -1,4 +1,4 @@
-package com.thenriquedb.url_shortener.util;
+package com.thenriquedb.url_shortener.shared.util;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
