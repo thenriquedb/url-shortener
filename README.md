@@ -16,13 +16,16 @@ A simple proof-of-concept (POC) URL shortener built with Spring Boot and MongoDB
 - **Request Body**:
 ```json
 {
-  "url": "https://example.com"
+  "url": "https://example.com",
+  "expiresAt": "2025-05-21T11:28:00" // Optional
 }
 ```
+
 - **Response**:
 ```json
 {
-  "shortUrl": "http://localhost:8080/abc123"
+  "shortUrl": "http://localhost:8080/abc123",
+  "expiresAt": "2025-05-21T11:28:00" // Or null if not set
 }
 ```
 
