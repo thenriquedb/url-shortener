@@ -25,6 +25,8 @@ services:
       - cache
     networks:
       - url-shortener-net
+    profiles:
+      - production
   mongo:
     container_name: mongodb
     image: mongo:latest
