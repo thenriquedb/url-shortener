@@ -1,7 +1,24 @@
 # Use root/example as user/password credentials
-version: '3.8'
+networks:
+  url-shortener-net:
+      driver: bridge
+
 services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: url-shortener-app:v1
+    restart: always
+    ports:
+      - 8080:8080
+    depends_on:
+      - mongo
+      - cache
+    networks:
+      - url-shortener-net
   mongo:
+    container_name: mongodb
     image: mongo:latest
     restart: always
     environment:
@@ -9,9 +26,14 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: password
     ports:
       - 27017:27017
+    networks:
+      - url-shortener-net
 
   cache:
+    container_name: redis
     image: redis:latest
     restart: always
     ports:
       - 6379:6379
+    networks:
+        - url-shortener-net
