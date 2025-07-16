@@ -2,7 +2,9 @@
 networks:
   url-shortener-net:
       driver: bridge
-
+volumes:
+    mongoData:
+        driver: local
 services:
   app:
     build:
@@ -19,7 +21,7 @@ services:
       - REDIS_HOST=cache
       - REDIS_PORT=${REDIS_PORT}
     ports:
-      - 8080:8080
+      - 8080:${APP_PORT}
     depends_on:
       - mongo
       - cache
@@ -32,12 +34,14 @@ services:
     image: mongo:latest
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
     ports:
       - 27017:27017
     networks:
       - url-shortener-net
+    volumes:
+      - mongoData:/data/db
 
   cache:
     container_name: redis
