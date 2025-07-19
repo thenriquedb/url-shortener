@@ -20,14 +20,23 @@ public class UrlController {
     UrlService urlService;
 
     @PostMapping("/shorten")
-    public ResponseEntity<UrlResponseRecordDto> shortenUrl(@RequestBody UrlRecordDto urlRecord, HttpServletRequest request) {
+    public ResponseEntity<UrlResponseRecordDto> shortenUrl(@RequestBody UrlRecordDto urlRecord, HttpServletRequest request,@RequestHeader(value = "Forwarded", required = false) String forwardedHeader, @RequestHeader Map<String, String> headers) {
         LocalDateTime expiresAt = null;
 
         if (urlRecord.expiresAt() != null) {
             expiresAt = LocalDateTime.parse(urlRecord.expiresAt());
         }
 
-        String requestUrl = request.getRequestURL().toString().replace(request.getRequestURI(), "");
+        String forwardedHost = request.getHeader("host");
+        String requestProtocol = request.getScheme();
+
+        String requestUrl = "";
+        if(forwardedHost != null) {
+            requestUrl += requestProtocol + "://" + forwardedHost;
+        } else {
+            requestUrl += request.getRequestURL().toString().replace(request.getRequestURI(), "");
+        }
+
         String shortUrl = urlService.generateShortUrl(urlRecord.url(), expiresAt, requestUrl);
 
         return ResponseEntity.ok().body(new UrlResponseRecordDto(shortUrl, expiresAt));
