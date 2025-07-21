@@ -35,6 +35,11 @@ services:
     depends_on:
       - mongo
       - cache
+    secrets:
+      - MONGO_USER
+      - MONGO_PASSWORD
+      - MONGO_DB
+      - REDIS_PORT
     deploy:
         replicas: 2
         restart_policy:
@@ -50,6 +55,9 @@ services:
       - 27017:27017
     networks:
       - url-shortener-net
+    secrets:
+      - MONGO_USER
+      - MONGO_PASSWORD
     volumes:
       - mongoData:/data/db
 
