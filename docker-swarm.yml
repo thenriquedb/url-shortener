@@ -31,9 +31,8 @@ services:
       - MONGO_DB_FILE=/run/secrets/MONGO_DB
       - REDIS_HOST=cache
       - REDIS_PORT_FILE=/run/secrets/REDIS_PORT
-      - APP_PORT_FILE=/run/secrets/APP_PORT
     ports:
-      - ${APP_PORT}:${APP_PORT}
+      - 8082:8082
     depends_on:
       - mongo
       - cache
@@ -43,7 +42,6 @@ services:
       - MONGO_PASSWORD
       - MONGO_DB
       - REDIS_PORT
-      - APP_PORT
     deploy:
       replicas: 2
       restart_policy:
@@ -82,8 +80,6 @@ services:
       - url-shortener-net
 
 secrets:
-  APP_PORT:
-    external: true
   MONGO_PORT:
     external: true
   MONGO_USER:
