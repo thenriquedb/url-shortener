@@ -1,11 +1,12 @@
 version: "3.7"
 networks:
-    url-shortener-net:
-        driver: overlay
-        attachable: true
+  url-shortener-net:
+    driver: overlay
+    attachable: true
+
 volumes:
-    mongoData:
-        driver: local
+  mongoData:
+    driver: local
 
 services:
   nginx:
@@ -15,42 +16,46 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
     deploy:
-        replicas: 2
-        restart_policy:
-            condition: on-failure
+      replicas: 2
+      restart_policy:
+        condition: on-failure
     networks:
       - url-shortener-net
   app:
     image: url-shortener-app:v1
     environment:
       - MONGO_HOST=mongo
-      - MONGO_PORT=${MONGO_PORT}
-      - MONGO_USER=${MONGO_USER}
-      - MONGO_PASSWORD=${MONGO_PASSWORD}
-      - MONGO_DB=${MONGO_DB}
+      - MONGO_PORT_FILE=/run/secrets/MONGO_PORT
+      - MONGO_USER_FILE=/run/secrets/MONGO_USER
+      - MONGO_PASSWORD_FILE=/run/secrets/MONGO_PASSWORD
+      - MONGO_DB_FILE=/run/secrets/MONGO_DB
       - REDIS_HOST=cache
-      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PORT_FILE=/run/secrets/REDIS_PORT
+      - APP_PORT_FILE=/run/secrets/APP_PORT
     ports:
       - ${APP_PORT}:${APP_PORT}
     depends_on:
       - mongo
       - cache
     secrets:
+      - MONGO_PORT
       - MONGO_USER
       - MONGO_PASSWORD
       - MONGO_DB
       - REDIS_PORT
+      - APP_PORT
     deploy:
-        replicas: 2
-        restart_policy:
-            condition: on-failure
+      replicas: 2
+      restart_policy:
+        condition: on-failure
     networks:
       - url-shortener-net
+
   mongo:
     image: mongo:latest
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_ROOT_USERNAME_FILE: /run/secrets/MONGO_USER
+      MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/MONGO_PASSWORD
     ports:
       - 27017:27017
     networks:
@@ -64,14 +69,28 @@ services:
   cache:
     image: redis:latest
     deploy:
-        replicas: 1
-        resources:
-            limits:
-                cpus: '0.5'
-                memory: 512M
-        restart_policy:
-            condition: on-failure
+      replicas: 1
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+      restart_policy:
+        condition: on-failure
     ports:
       - 6379:6379
     networks:
       - url-shortener-net
+
+secrets:
+  APP_PORT:
+    external: true
+  MONGO_PORT:
+    external: true
+  MONGO_USER:
+    external: true
+  MONGO_PASSWORD:
+    external: true
+  MONGO_DB:
+    external: true
+  REDIS_PORT:
+    external: true
