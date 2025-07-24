@@ -40,5 +40,9 @@ variable "instance_key_pair_name" {
   default     = "deployer-key"
 }
 
-
+variable "state_bucket" {
+    description = "The name of the S3 bucket for storing Terraform state"
+    type        = string
+    default     = "iac-url-shortener-state-bucket"
+}
 
