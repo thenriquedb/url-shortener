@@ -32,3 +32,10 @@ build/
 ### VS Code ###
 .vscode/
 .env
+
+### TerraForm ###
+terraform.tfstate
+/terraform/.terraform/
+
+### Other ###
+*.pem
