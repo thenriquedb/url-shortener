@@ -70,7 +70,7 @@ resource "aws_security_group" "url_shortener_ssh_sg" {
 }
 
 resource "aws_instance" "url_shortener_ec2" {
-  ami                         = var.intance_ami
+  ami                         = data.aws_ami.ubuntu.id
   instance_type               = var.instance_type
   subnet_id                   = aws_subnet.url_shortener_subnet.id
   associate_public_ip_address = true
@@ -84,4 +84,5 @@ resource "aws_instance" "url_shortener_ec2" {
 
 output "instance_public_ip" {
   value = aws_instance.url_shortener_ec2.public_ip
+  description = "Public IP of the EC2 instance"
 }

@@ -28,12 +28,6 @@ variable "instance_type" {
     default     = "t2.micro"
 }
 
-variable "intance_ami" {
-    description = "The AMI ID for the EC2 instance"
-    type        = string
-    default     = "ami-0a7d80731ae1b2435"
-}
-
 variable "instance_public_key_path" {
     description = "The public key for the EC2 instance"
     type        = string
