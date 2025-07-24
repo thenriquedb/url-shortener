@@ -32,3 +32,12 @@ build/
 ### VS Code ###
 .vscode/
 .env
+
+### TerraForm ###
+terraform.tfstate
+*.tfvars
+/terraform/.terraform/
+/terraform/terraform.tfstate.backup
+
+### Other ###
+*.pem
