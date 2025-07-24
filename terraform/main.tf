@@ -1,5 +1,5 @@
 resource "aws_vpc" "url_shortener_vpc" {
-  cidr_block = "10.0.0.0/16"
+  cidr_block = var.vpc_cidr
 
   tags = {
     Name = "iac-url-shortener-vpc"
@@ -7,9 +7,9 @@ resource "aws_vpc" "url_shortener_vpc" {
 }
 
 resource "aws_subnet" "url_shortener_subnet" {
-  vpc_id     = aws_vpc.url_shortener_vpc.id
-  cidr_block = "10.0.1.0/24"
-  availability_zone = "us-east-1a"
+  vpc_id            = aws_vpc.url_shortener_vpc.id
+  cidr_block        = var.subnet_cidr
+  availability_zone = var.availability_zone
 
   tags = {
     Name = "iac-url-shortener-subnet"
@@ -43,8 +43,8 @@ resource "aws_route_table_association" "a" {
 }
 
 resource "aws_key_pair" "deployer" {
-  key_name   = "deployer-key"
-  public_key = file("~/.ssh/id_rsa.pub") # Ensure you have your public key at this path
+  key_name   = var.instance_key_pair_name
+  public_key = file(var.instance_public_key_path)
 }
 
 resource "aws_security_group" "url_shortener_ssh_sg" {
@@ -53,10 +53,10 @@ resource "aws_security_group" "url_shortener_ssh_sg" {
   vpc_id = aws_vpc.url_shortener_vpc.id
 
   ingress {
-    from_port = 2
-    to_port   = 22
-    protocol  = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # Allow SSH from anywhere
+    from_port        = 22
+    to_port          = 22
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"] # Allow SSH from anywhere
     ipv6_cidr_blocks = ["::/0"] # Allow SSH from anywhere for IPv6
   }
 
@@ -70,12 +70,12 @@ resource "aws_security_group" "url_shortener_ssh_sg" {
 }
 
 resource "aws_instance" "url_shortener_ec2" {
-  ami           = "ami-0a7d80731ae1b2435" # Ubuntu 22.04 LTS
-  instance_type = "t2.micro"
-  subnet_id = aws_subnet.url_shortener_subnet.id
+  ami                         = var.intance_ami
+  instance_type               = var.instance_type
+  subnet_id                   = aws_subnet.url_shortener_subnet.id
   associate_public_ip_address = true
-  key_name = aws_key_pair.deployer.key_name
-  vpc_security_group_ids = [aws_security_group.url_shortener_ssh_sg.id]
+  key_name                    = aws_key_pair.deployer.key_name
+  vpc_security_group_ids      = [aws_security_group.url_shortener_ssh_sg.id]
 
   tags = {
     Name = "iac-url-shortener-api"
