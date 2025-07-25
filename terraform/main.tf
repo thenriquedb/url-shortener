@@ -76,6 +76,7 @@ resource "aws_instance" "url_shortener_ec2" {
   associate_public_ip_address = true
   key_name                    = aws_key_pair.deployer.key_name
   vpc_security_group_ids      = [aws_security_group.url_shortener_ssh_sg.id]
+  user_data = file("userdata.tpl")
 
   tags = {
     Name = "iac-url-shortener-api"
